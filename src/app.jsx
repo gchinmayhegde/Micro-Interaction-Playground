@@ -2,14 +2,14 @@ import React, { useState, useEffect, createContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, Sun, Moon, Github, Copy } from 'lucide-react';
 import useTheme from './hooks/useTheme';
-import Sidebar from './components/Sidebar';
-import Modal from './components/ui/Modal';
 import { AnimatedButton, PulseButton, GlowButton } from './components/ui/AnimatedButton';
 import { AnimatedToggle, FlipToggle } from './components/ui/AnimatedToggle';
 import { SpinLoader, DotsLoader, ProgressBar } from './components/ui/Loaders';
+import Modal from './components/ui/Modal';
 import { Tooltip, Toast } from './components/ui/Tooltip';
-import InteractionCard from './components/InteractionCard';
 import CodeEditor from './components/CodeEditor';
+import InteractionCard from './components/InteractionCard';
+import Sidebar from './components/Sidebar';
 
 const ThemeContext = createContext();
 
@@ -24,7 +24,13 @@ export default function MicroInteractionPlayground() {
   const [toggle2, setToggle2] = useState(false);
   const [progress, setProgress] = useState(75);
   const [showModal, setShowModal] = useState(false);
-
+  const categories = [
+    { id: 'buttons', name: 'Button Animations' },
+    { id: 'toggles', name: 'Toggle Switches' },
+    { id: 'loaders', name: 'Loaders' },
+    { id: 'modals', name: 'Modals' },
+    { id: 'tooltips', name: 'Tooltips & Toasts' },
+  ];
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add('dark');
@@ -32,24 +38,14 @@ export default function MicroInteractionPlayground() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
-
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(new Set(JSON.parse(savedFavorites)));
-    }
-  }, []);
-
   const showToast = (message, type = 'success') => {
     setToast({ isVisible: true, message, type });
     setTimeout(() => setToast(prev => ({ ...prev, isVisible: false })), 3000);
   };
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     showToast('Code copied to clipboard!');
   };
-
   const toggleFavorite = (id) => {
     const newFavorites = new Set(favorites);
     if (newFavorites.has(id)) {
@@ -58,17 +54,13 @@ export default function MicroInteractionPlayground() {
       newFavorites.add(id);
     }
     setFavorites(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify([...newFavorites]));
   };
-
   const openModal = (title, code, component) => {
     setModalData({ isOpen: true, title, code, component });
   };
-
   const closeModal = () => {
     setModalData({ isOpen: false, title: '', code: '', component: null });
   };
-
   const renderCategoryContent = () => {
     switch (selectedCategory) {
       case 'buttons':
@@ -149,9 +141,9 @@ export default function MicroInteractionPlayground() {
 >
   <motion.div
     className="w-6 h-6 bg-white rounded-full shadow-md"
-    animate={{ x: isOn ? 32 : 0 }}
-    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-  />
+  animate={{ x: isOn ? 32 : 0 }}
+  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+/>
 </motion.div>`}
               onClick={openModal}
               toggleFavorite={toggleFavorite}
@@ -226,9 +218,9 @@ export default function MicroInteractionPlayground() {
 <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden">
   <motion.div
     className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-    animate={{ width: \`\${progress}%\` }}
-    transition={{ duration: 0.5 }}
-  />
+  animate={{ width: \`\${progress}%\` }}
+  transition={{ duration: 0.5 }}
+/>
 </div>`}
               onClick={openModal}
               toggleFavorite={toggleFavorite}
@@ -343,7 +335,6 @@ export default function MicroInteractionPlayground() {
         return null;
     }
   };
-
   return (
     <ThemeContext.Provider value={{ isDark, toggleTheme }}>
       <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
@@ -397,12 +388,28 @@ export default function MicroInteractionPlayground() {
           </main>
         </div>
         <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title="Demo Modal"
+        >
+          <div className="p-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              This is a demo modal with smooth animations powered by Framer Motion!
+            </p>
+            <AnimatedButton onClick={() => setShowModal(false)}>
+              Close Modal
+            </AnimatedButton>
+          </div>
+        </Modal>
+        <Modal
           isOpen={modalData.isOpen}
           onClose={closeModal}
           title={modalData.title}
         >
           <div className="space-y-4">
-            {modalData.component}
+            <div className="flex justify-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              {modalData.component}
+            </div>
             <CodeEditor
               code={modalData.code}
               onChange={(code) => setModalData(prev => ({ ...prev, code }))}

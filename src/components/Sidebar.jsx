@@ -10,7 +10,6 @@ const Sidebar = ({ selectedCategory, setSelectedCategory, setIsSidebarOpen, isSi
     { id: 'modals', name: 'Modals', icon: Square },
     { id: 'tooltips', name: 'Tooltips & Toasts', icon: MessageCircle },
   ];
-
   return (
     <AnimatePresence>
       {(isSidebarOpen || window.innerWidth >= 768) && (
